@@ -1,0 +1,3 @@
+To reproduce RHEL-37510 with this test, in this directory, run:
+
+# while ./bz_37510.sh ; do echo PASS >> out ; done
