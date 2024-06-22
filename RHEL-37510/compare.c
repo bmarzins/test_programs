@@ -67,7 +67,8 @@ void validate_file(size_t size, int fd, char *buf, char *pattern)
 		if (memcmp(buf, pattern, BUFSIZE)) {
 			int j;
 			fprintf(stderr,
-				"file not equal to the pattern at %zu\n", i);
+				"file not equal to the pattern at %zu\n",
+				i >> 9);
 			fprintf(stderr, "++++file++++\n");
 			for (j = 0; j < NR_PATTERN; j++)
 				fprintf(stderr, "%.64s\n",
