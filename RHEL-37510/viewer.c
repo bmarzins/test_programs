@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 {
 	char *buf;
 	int r, i, fd;
-	size_t sector, nr_sectors = 8;
+	size_t sector, nr_sectors = 1;
 	char unit, dummy;
 
 	if (argc < 3 || argc > 4) {

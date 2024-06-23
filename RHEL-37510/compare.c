@@ -12,9 +12,10 @@
 #include <sys/types.h>
 
 #define BUFSIZE 4096U
-#define PATTERN "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234abcdefghijklmnopqrstuvwxyz00000000"
-#define PATTERN_LEN (sizeof(PATTERN) - 1)
-#define COUNT_OFFSET (PATTERN_LEN - 8)
+#define PATTERN "ABCDEFGHIJKLMNOPQRSTUVWXYZ%05uabcdefghijklmnopqrstuvwxyz%07u"
+#define PATTERN_LEN 64
+#define SECTOR_OFFSET (PATTERN_LEN - 7)
+#define STRIPE_OFFSET 26
 #define NR_PATTERN (BUFSIZE / PATTERN_LEN)
 
 void read_buf(int fd, char *buf)
@@ -45,15 +46,14 @@ void read_buf(int fd, char *buf)
 void update_pattern(unsigned int count, char *pattern)
 {
 	int i;
-	char buf[9];
-	char *ptr = pattern + COUNT_OFFSET;
-	count /= NR_PATTERN;
+	char buf[PATTERN_LEN + 1];
+	char *ptr = pattern;
 
 	for (i = 0; i < NR_PATTERN; i++) {
-		snprintf(buf, sizeof(buf), "%08u", count);
-		memcpy(ptr, buf, 8);
+		snprintf(buf, sizeof(buf), PATTERN, count / 65536, count / 512);
+		memcpy(ptr, buf, PATTERN_LEN);
 		ptr += PATTERN_LEN;
-		count++;
+		count += PATTERN_LEN;
 	}
 }
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	alignas(BUFSIZE) char buf[BUFSIZE];
 	struct stat sb;
 	int fd;
-	size_t i, size;
+	size_t size;
 	char dummy;
 
 	assert(BUFSIZE % 512 == 0);
@@ -118,9 +118,6 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "open of '%s' failed: %m\n", argv[1]);
 		return 1;
 	}
-
-	for (i = 0; i < NR_PATTERN; i++)
-		memcpy(&pattern[i * PATTERN_LEN], PATTERN, PATTERN_LEN);
 
 	while (1) {
 		if (stat("check_file", &sb)) {

@@ -3,7 +3,7 @@ set -e
 set -x
 
 # counter=0
-# while true; do printf "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234abcdefghijklmnopqrstuvwxyz%08i" $counter; counter=$((counter+1)); done | dd of=bz_37510.img bs=1M count=16 iflag=fullblock
+# while true; do printf "ABCDEFGHIJKLMNOPQRSTUVWXYZ%05iabcdefghijklmnopqrstuvwxyz%07i" $((counter/1024)) $((counter/8)); counter=$((counter+1)); done | dd of=bz_37510.img bs=1M count=16 iflag=fullblock
 
 modprobe brd rd_size=34816 rd_nr=5
 vgcreate -s 512K vg /dev/ram*
